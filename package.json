@@ -1,0 +1,23 @@
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "prod": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop ecosystem.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.17.16",
+    "dotenv": "^16.4.7",
+    "pino": "^9.6.0",
+    "pm2": "^6.0.5",
+    "qrcode-terminal": "^0.12.0",
+    "sqlite3": "^5.1.7"
+  }
+}
