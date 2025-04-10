@@ -1,11 +1,16 @@
 import os
+
+# Ensure DISPLAY environment variable is set for headless environments
+if "DISPLAY" not in os.environ:
+    os.environ["DISPLAY"] = ":99"
+
 import logging
 from dotenv import load_dotenv
 import openai
-from whatsapp_web.js import Client, LocalAuth
 from fastapi import FastAPI, HTTPException
 import uvicorn
 import asyncio
+from pywhatkit import sendwhatmsg
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,51 +40,24 @@ async def generate_ai_response(prompt):
 
 async def handle_message(message):
     try:
-        if message.body.startswith('!ai '):
+        if message.startswith('!ai '):
             # Extract the query
-            query = message.body[4:].strip()
-            
+            query = message[4:].strip()
+
             # Generate response
             response = await generate_ai_response(query)
-            
-            # Send response
-            chat = await message.getChat()
-            await chat.sendMessage(response)
-            
+
+            # Send response using pywhatkit
+            # Replace 'receiver_number' with the actual recipient's phone number
+            receiver_number = "+1234567890"  # Example number, replace with actual
+            sendwhatmsg(receiver_number, response, 22, 0)  # Example time: 22:00
+
     except Exception as e:
         logger.error(f"Error handling message: {str(e)}")
 
-async def initialize_whatsapp():
-    global client
-    client = Client(
-        puppeteer={
-            'headless': True,
-            'args': ['--no-sandbox']
-        }
-    )
-    
-    @client.on('qr')
-    def on_qr(qr):
-        logger.info(f"QR Code received: {qr}")
-    
-    @client.on('ready')
-    def on_ready():
-        logger.info("WhatsApp client is ready!")
-    
-    @client.on('message')
-    def on_message(message):
-        asyncio.create_task(handle_message(message))
-    
-    @client.on('disconnected')
-    def on_disconnect():
-        logger.warning("WhatsApp client disconnected. Attempting to reconnect...")
-        asyncio.create_task(client.initialize())
-    
-    await client.initialize()
-
 @app.on_event("startup")
 async def startup_event():
-    await initialize_whatsapp()
+    logger.info("Bot is ready to send messages using pywhatkit.")
 
 @app.get("/health")
 async def health_check():
