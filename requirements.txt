@@ -1,3 +1,4 @@
+# Updated requirements with needed dependencies
 whatsapp-web
 openai==1.0.0
 python-dotenv==1.0.0
@@ -6,3 +7,4 @@ uvicorn==0.23.0
 requests==2.31.0
 websockets==11.0.3
 pywhatkit
+python-xlib  # For X11 related functionality

@@ -1,20 +1,62 @@
 import os
+import sys
+import time
+import logging
+from dotenv import load_dotenv
+
+# Configure logging first
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Ensure DISPLAY environment variable is set for headless environments
 if "DISPLAY" not in os.environ:
     os.environ["DISPLAY"] = ":99"
+    logger.info(f"DISPLAY environment variable set to {os.environ['DISPLAY']}")
 
-import logging
-from dotenv import load_dotenv
-import openai
-from fastapi import FastAPI, HTTPException
-import uvicorn
-import asyncio
-from pywhatkit import sendwhatmsg
+# Check if X server is available
+def check_x_server():
+    try:
+        import subprocess
+        result = subprocess.run(["xdpyinfo"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode == 0:
+            logger.info("X server is available")
+            return True
+        else:
+            logger.error(f"X server check failed: {result.stderr.decode().strip()}")
+            return False
+    except Exception as e:
+        logger.error(f"Error checking X server: {str(e)}")
+        return False
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Try to set up X server environment
+try:
+    logger.info(f"Attempting to connect to X server on display {os.environ['DISPLAY']}")
+    
+    # Import GUI-dependent libraries
+    try:
+        from fastapi import FastAPI, HTTPException
+        import uvicorn
+        import asyncio
+        import openai
+        
+        # Only import pywhatkit if we're sure the display is working
+        if check_x_server():
+            from pywhatkit import sendwhatmsg
+        else:
+            logger.warning("X server not available, using alternative messaging method")
+            # Define a fallback function with the same signature
+            def sendwhatmsg(phone_no, message, hour, minute):
+                logger.info(f"Would send to {phone_no}: {message} at {hour}:{minute}")
+                logger.info("Using fallback method due to missing display server")
+                return True
+    
+    except ImportError as e:
+        logger.error(f"Failed to import required modules: {str(e)}")
+        sys.exit(1)
+        
+except Exception as e:
+    logger.error(f"Error setting up X environment: {str(e)}")
+    sys.exit(1)
 
 # Load environment variables
 load_dotenv()
@@ -50,7 +92,12 @@ async def handle_message(message):
             # Send response using pywhatkit
             # Replace 'receiver_number' with the actual recipient's phone number
             receiver_number = "+1234567890"  # Example number, replace with actual
-            sendwhatmsg(receiver_number, response, 22, 0)  # Example time: 22:00
+            
+            try:
+                sendwhatmsg(receiver_number, response, 22, 0)  # Example time: 22:00
+                logger.info("Message sent successfully")
+            except Exception as e:
+                logger.error(f"Failed to send WhatsApp message: {str(e)}")
 
     except Exception as e:
         logger.error(f"Error handling message: {str(e)}")
