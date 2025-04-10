@@ -1,60 +1,65 @@
-# WhatsApp Bot
+# WhatsApp AI Bot
 
-A WhatsApp bot that welcomes new members, tracks activity, and manages group participants.
+A Python-based WhatsApp bot that uses OpenAI's API to respond to messages prefixed with "!ai".
 
 ## Features
-- Welcomes new group members with a personalized message
-- Tracks user activity in groups
-- Automatically removes inactive members (30 days without messages)
-- Auto-reconnection handling
-- Persistent session management
+- Responds to both personal and group messages
+- Generates concise AI responses (limited to 70 characters)
+- Auto-reconnection capability
+- Error handling for API and connection issues
+- Health check endpoint
 
-## Deployment Guide
+## Setup Instructions
 
-### Prerequisites
-- Node.js 16 or higher
-- A Railway.app account
-- WhatsApp account for the bot
+1. Clone this repository
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+3. Configure environment variables:
+   - Copy `.env.example` to `.env`
+   - Add your OpenAI API key in the `.env` file
 
-### Deployment Steps on Railway
+## Running the Bot
 
-1. Fork/Clone this repository to your GitHub account
+1. Local development:
+   ```
+   python whatsapp_bot.py
+   ```
+2. Scan the QR code with WhatsApp when prompted
 
-2. Go to [Railway.app](https://railway.app) and sign up/login
+## Usage
 
-3. Click "New Project" → "Deploy from GitHub repo"
+- In personal chats or groups, send a message starting with "!ai" followed by your question
+- Example: "!ai What is the capital of France?"
 
-4. Select your repository
+## Deployment
 
-5. Add the following environment variables in Railway dashboard:
-   - `NODE_ENV=production`
-   - `DEBUG_LOGS=false`
+### Deploying to Heroku:
+1. Create a new Heroku app
+2. Set environment variables in Heroku dashboard
+3. Deploy using Heroku Git:
+   ```
+   heroku login
+   heroku git:remote -a your-app-name
+   git push heroku main
+   ```
 
-6. Once deployed, go to your project's deployment logs to see the QR code
+### Deploying to Replit:
+1. Create a new Repl
+2. Upload project files
+3. Add environment variables in Replit Secrets
+4. Click "Run"
 
-7. Scan the QR code with WhatsApp (Settings → Linked Devices → Link a Device)
+## Error Handling
 
-8. The bot will start running automatically
+The bot includes error handling for:
+- Invalid API responses
+- Connection issues
+- Message processing errors
 
-### Important Notes
-- The bot needs to be authenticated only once
-- Session data is stored in the `auth_info` directory
-- Database is stored in SQLite file
-- The bot will automatically reconnect if disconnected
+## Limitations
 
-## Local Development
-```bash
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run dev
-
-# Run in production mode
-npm run prod
-```
-
-## Monitoring
-- Use `pm2 status` to check bot status
-- Use `pm2 logs whatsapp-bot` to view logs
-- The bot auto-restarts on crashes
+- Responses are limited to 70 characters to optimize token usage
+- Requires a stable internet connection
+- WhatsApp account must remain connected
