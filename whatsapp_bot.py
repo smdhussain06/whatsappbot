@@ -91,7 +91,7 @@ async def handle_message(message):
 
             # Send response using pywhatkit
             # Replace 'receiver_number' with the actual recipient's phone number
-            receiver_number = "+1234567890"  # Example number, replace with actual
+            receiver_number = "+919344115330"  # Example number, replace with actual
             
             try:
                 sendwhatmsg(receiver_number, response, 22, 0)  # Example time: 22:00
