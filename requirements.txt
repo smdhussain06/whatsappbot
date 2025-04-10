@@ -1,4 +1,4 @@
-python-whatsapp-web-js==1.0.0
+whatsapp-web
 openai==1.0.0
 python-dotenv==1.0.0
 fastapi==0.100.0
